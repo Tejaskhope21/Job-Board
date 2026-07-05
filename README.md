@@ -1,4 +1,4 @@
-# 🚀 JobNest — AI-Powered Job Portal
+#  JobNest — AI-Powered Job Portal
 
 <div align="center">
 
@@ -14,7 +14,7 @@
 
 ### A Modern, Full-Stack, AI-Powered Job Portal Platform
 
-Developed by Tejas Khope 
+**Developed by Tejas Khope**
 
 🌐 **Live Demo:** [jobnestfrontendbytejas.vercel.app](https://jobnestfrontendbytejas.vercel.app)
 
@@ -61,6 +61,11 @@ JobNest goes beyond a typical CRUD job board by integrating **Google Gemini AI**
 
 - An **ATS (Applicant Tracking System) Resume Checker** that scores and analyzes candidate resumes.
 - An **AI Job Description Generator** that helps employers create professional job postings instantly from just a job title.
+
+**🎥 Watch the AI Job Description Generator demo:**
+
+
+https://github.com/user-attachments/assets/445cffa5-16f0-423f-a1ad-82a2c390aa3e
 
 This makes JobNest not just a listing platform, but an **intelligent recruitment ecosystem** that adds real value to both sides of the hiring process.
 
@@ -725,7 +730,7 @@ This project is developed for **educational and portfolio purposes** under the *
 ## 👨‍💻 Author
 
 ### Tejas Khope
-**Full Stack MERN Developer**
+
 
 - 🌐 Live Project: [jobnestfrontendbytejas.vercel.app](https://jobnestfrontendbytejas.vercel.app)
 - 💼 Specialization: MERN Stack, AI Integration, Full-Stack Web Development
@@ -750,6 +755,8 @@ This project is developed for **educational and portfolio purposes** under the *
 ---
 
 <div align="center">
+
+### ⭐ If you like this project, don't forget to give it a Star on GitHub!
 
 **Made with ❤️ by Tejas Khope**
 
