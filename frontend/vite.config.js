@@ -11,7 +11,7 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/api': {
-        target: 'https://job-board-backend-chi.vercel.app',
+        target: 'https://job-board-backend-two.vercel.app',
         changeOrigin: true,
       },
     },
