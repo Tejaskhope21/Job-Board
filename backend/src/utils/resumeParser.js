@@ -1,4 +1,11 @@
 // utils/resumeParser.js
+//
+// ✅ NOTE: No functional changes needed in this file. The root cause of the
+// "ATS Score: 0%" bug was in the ROUTES/CONTROLLER (multer-storage-cloudinary
+// never gave us req.file.buffer), NOT here. extractTextFromBuffer() below
+// already correctly accepts a Buffer and works fine once the route/controller
+// actually pass it a real buffer (see routes/resume.js + resumeController.js).
+//
 import fs from 'fs';
 import axios from 'axios';
 import path from 'path';
@@ -27,7 +34,7 @@ const MAX_TEXT_LENGTH = 50000; // Max characters to extract
  */
 const downloadFile = async (url) => {
   const tempDir = path.join(process.cwd(), 'temp');
-  
+
   // Temp directory create karein agar nahi hai
   if (!fs.existsSync(tempDir)) {
     fs.mkdirSync(tempDir, { recursive: true });
@@ -64,19 +71,19 @@ const downloadFile = async (url) => {
 
     return new Promise((resolve, reject) => {
       const writer = fs.createWriteStream(tempFile);
-      
+
       response.data.pipe(writer);
-      
+
       writer.on('finish', () => {
         console.log('✅ File downloaded successfully to:', tempFile);
         resolve(tempFile);
       });
-      
+
       writer.on('error', (error) => {
         console.error('❌ Error writing file:', error);
         reject(error);
       });
-      
+
       response.data.on('error', (error) => {
         console.error('❌ Error downloading file:', error);
         reject(error);
@@ -117,30 +124,30 @@ const isUrl = (str) => {
 const extractPDFText = async (buffer) => {
   try {
     console.log('📄 Parsing PDF file...');
-    
+
     // Try with default options
     const data = await pdfParse(buffer, {
       max: 10000, // Max pages to parse
       version: 'v1.10.100'
     });
-    
+
     if (!data || !data.text) {
       console.warn('⚠️ PDF parsing returned no text');
       return '';
     }
-    
+
     const text = cleanText(data.text);
     console.log(`✅ PDF parsed: ${text.length} characters`);
-    
+
     // Check if it's a scanned image PDF (no real text)
     if (text.length < 100 && data.text.includes('gzip')) {
       console.warn('⚠️ PDF appears to be a scanned image or compressed');
     }
-    
+
     return text;
   } catch (error) {
     console.error('❌ PDF parsing error:', error.message);
-    
+
     // Try fallback - extract raw text
     try {
       const rawText = buffer.toString('utf8').replace(/[^\x20-\x7E\n\r]/g, ' ');
@@ -151,7 +158,7 @@ const extractPDFText = async (buffer) => {
     } catch (fallbackError) {
       console.error('❌ Fallback extraction failed:', fallbackError.message);
     }
-    
+
     return '';
   }
 };
@@ -163,18 +170,18 @@ const extractDOCXText = async (buffer) => {
   try {
     console.log('📄 Parsing DOCX file...');
     const result = await mammoth.extractRawText({ buffer });
-    
+
     if (!result || !result.value) {
       console.warn('⚠️ DOCX parsing returned no text');
       return '';
     }
-    
+
     const text = cleanText(result.value);
     console.log(`✅ DOCX parsed: ${text.length} characters`);
     return text;
   } catch (error) {
     console.error('❌ DOCX parsing error:', error.message);
-    
+
     // Try fallback
     try {
       const rawText = buffer.toString('utf8').replace(/[^\x20-\x7E\n\r]/g, ' ');
@@ -185,7 +192,7 @@ const extractDOCXText = async (buffer) => {
     } catch (fallbackError) {
       console.error('❌ Fallback extraction failed:', fallbackError.message);
     }
-    
+
     return '';
   }
 };
@@ -198,12 +205,12 @@ const extractDOCText = async (buffer) => {
     console.log('📄 Parsing DOC file (legacy format)...');
     // Try to extract as much readable text as possible
     let rawText = buffer.toString('utf8');
-    
+
     // Remove binary garbage but keep readable text
     rawText = rawText
       .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, ' ') // Remove control characters except newlines
       .replace(/[^\x20-\x7E\n\r]/g, ' '); // Keep only printable ASCII
-    
+
     // Try to find actual readable content
     const lines = rawText.split('\n').filter(line => {
       // Filter out lines that are mostly gibberish
@@ -211,7 +218,7 @@ const extractDOCText = async (buffer) => {
       const totalLength = line.length;
       return totalLength > 0 && (alphaCount / totalLength) > 0.3;
     });
-    
+
     const text = cleanText(lines.join('\n'));
     console.log(`✅ DOC parsed: ${text.length} characters`);
     return text;
@@ -228,7 +235,7 @@ const extractDOCText = async (buffer) => {
 export const extractTextFromResume = async (filePath, mimeType) => {
   console.log('🚀 Starting text extraction from:', filePath);
   console.log('📋 MIME type:', mimeType);
-  
+
   let localFilePath = filePath;
   let isTempFile = false;
 
@@ -250,12 +257,12 @@ export const extractTextFromResume = async (filePath, mimeType) => {
     // Check file size
     const stats = fs.statSync(localFilePath);
     console.log(`📄 File size: ${(stats.size / 1024).toFixed(2)} KB`);
-    
+
     if (stats.size === 0) {
       console.error('❌ File is empty');
       return '';
     }
-    
+
     if (stats.size > MAX_FILE_SIZE) {
       console.error(`❌ File too large: ${stats.size} bytes`);
       return '';
@@ -285,18 +292,18 @@ export const extractTextFromResume = async (filePath, mimeType) => {
     try {
       if (detectedMimeType === SUPPORTED_MIME_TYPES.pdf || ext === '.pdf') {
         text = await extractPDFText(buffer);
-      } 
+      }
       else if (detectedMimeType === SUPPORTED_MIME_TYPES.docx || ext === '.docx') {
         text = await extractDOCXText(buffer);
-      } 
+      }
       else if (detectedMimeType === SUPPORTED_MIME_TYPES.doc || ext === '.doc') {
         text = await extractDOCText(buffer);
-      } 
+      }
       else if (detectedMimeType === SUPPORTED_MIME_TYPES.txt || ext === '.txt') {
         console.log('📄 Parsing TXT file...');
         text = cleanText(buffer.toString('utf8'));
         console.log(`✅ TXT parsed: ${text.length} characters`);
-      } 
+      }
       else if (detectedMimeType === SUPPORTED_MIME_TYPES.rtf || ext === '.rtf') {
         console.log('📄 Parsing RTF file...');
         // Try to extract text from RTF
@@ -333,7 +340,7 @@ export const extractTextFromResume = async (filePath, mimeType) => {
     // Log text stats
     console.log(`📊 Extracted text length: ${text.length}`);
     console.log(`📊 Word count: ${text.split(/\s+/).filter(w => w.length > 0).length}`);
-    
+
     if (text.length > 0) {
       console.log('📝 First 200 characters:', text.substring(0, 200));
     }
@@ -359,7 +366,7 @@ export const extractTextFromResume = async (filePath, mimeType) => {
   } catch (error) {
     console.error('❌ Error extracting resume text:', error.message);
     console.error('❌ Stack trace:', error.stack);
-    
+
     // Clean up temp file if exists
     if (isTempFile && localFilePath && fs.existsSync(localFilePath)) {
       try {
@@ -369,7 +376,7 @@ export const extractTextFromResume = async (filePath, mimeType) => {
         console.warn('⚠️ Could not delete temp file:', cleanupError.message);
       }
     }
-    
+
     return ''; // Return empty string on error
   }
 };
@@ -379,7 +386,7 @@ export const extractTextFromResume = async (filePath, mimeType) => {
  */
 const cleanText = (text) => {
   if (!text) return '';
-  
+
   return text
     .replace(/\r\n/g, '\n')     // Windows newlines
     .replace(/\r/g, '\n')       // Old Mac newlines
@@ -397,21 +404,21 @@ const cleanText = (text) => {
 export const extractTextFromBuffer = async (buffer, mimeType) => {
   try {
     console.log('📄 Extracting text from buffer, mimeType:', mimeType);
-    
+
     let text = '';
 
     if (mimeType === SUPPORTED_MIME_TYPES.pdf) {
       text = await extractPDFText(buffer);
-    } 
+    }
     else if (mimeType === SUPPORTED_MIME_TYPES.docx) {
       text = await extractDOCXText(buffer);
-    } 
+    }
     else if (mimeType === SUPPORTED_MIME_TYPES.doc) {
       text = await extractDOCText(buffer);
-    } 
+    }
     else if (mimeType === SUPPORTED_MIME_TYPES.txt) {
       text = cleanText(buffer.toString('utf8'));
-    } 
+    }
     else {
       // Try to extract as plain text
       text = cleanText(buffer.toString('utf8').replace(/[^\x20-\x7E\n\r]/g, ' '));
@@ -431,18 +438,18 @@ export const extractTextFromBuffer = async (buffer, mimeType) => {
 export const isValidResumeFile = (filename, mimeType) => {
   const validExtensions = ['.pdf', '.docx', '.doc', '.txt', '.rtf', '.odt'];
   const ext = path.extname(filename).toLowerCase();
-  
+
   // Check extension
   if (!validExtensions.includes(ext)) {
     return false;
   }
-  
+
   // Check mime type
   const validMimeTypes = Object.values(SUPPORTED_MIME_TYPES);
   if (mimeType && !validMimeTypes.includes(mimeType)) {
     return false;
   }
-  
+
   return true;
 };
 
@@ -451,14 +458,14 @@ export const isValidResumeFile = (filename, mimeType) => {
  */
 export const getFileType = (filename, mimeType) => {
   const ext = path.extname(filename).toLowerCase();
-  
+
   if (ext === '.pdf' || mimeType === SUPPORTED_MIME_TYPES.pdf) return 'PDF';
   if (ext === '.docx' || mimeType === SUPPORTED_MIME_TYPES.docx) return 'DOCX';
   if (ext === '.doc' || mimeType === SUPPORTED_MIME_TYPES.doc) return 'DOC';
   if (ext === '.txt' || mimeType === SUPPORTED_MIME_TYPES.txt) return 'TXT';
   if (ext === '.rtf' || mimeType === SUPPORTED_MIME_TYPES.rtf) return 'RTF';
   if (ext === '.odt' || mimeType === SUPPORTED_MIME_TYPES.odt) return 'ODT';
-  
+
   return 'Unknown';
 };
 

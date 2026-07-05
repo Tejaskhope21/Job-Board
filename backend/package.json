@@ -32,6 +32,7 @@
     "openai": "^6.45.0",
     "pdf-parse": "^1.1.1",
     "socket.io": "^4.8.3",
+    "streamifier": "^0.1.1",
     "uuid": "^14.0.1",
     "xss-clean": "^0.1.4"
   }

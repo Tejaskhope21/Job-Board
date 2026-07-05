@@ -1,7 +1,6 @@
+// routes/resume.js
 import express from 'express';
 import multer from 'multer';
-import { CloudinaryStorage } from 'multer-storage-cloudinary';
-import cloudinary from '../config/cloudinary.js';
 import { protect } from '../middleware/auth.js';
 import {
   uploadResume,
@@ -13,25 +12,13 @@ import {
 
 const router = express.Router();
 
-// Cloudinary Storage Configuration
-const storage = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: {
-    folder: 'resumes',
-    allowed_formats: ['pdf', 'doc', 'docx', 'txt'],
-    resource_type: 'raw',
-    format: async (req, file) => {
-      // Keep original file extension
-      const ext = file.originalname.split('.').pop();
-      return ext;
-    },
-    public_id: (req, file) => {
-      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-      const ext = file.originalname.split('.').pop();
-      return `resume-${req.user._id}-${uniqueSuffix}`;
-    },
-  },
-});
+// ✅ FIX: memoryStorage use kar rahe hain instead of CloudinaryStorage.
+// CloudinaryStorage seedha stream karke Cloudinary pe upload kar deta hai,
+// isliye req.file.buffer kabhi milta hi nahi tha (ye hamesha undefined tha).
+// memoryStorage se req.file.buffer reliably milega, jo text extraction
+// (pdf-parse / mammoth) ke liye zaroori hai. Cloudinary upload ab hum
+// controller me manually, buffer se, karte hain (streamifier ke through).
+const storage = multer.memoryStorage();
 
 const fileFilter = (req, file, cb) => {
   const allowedTypes = [
@@ -51,8 +38,8 @@ const fileFilter = (req, file, cb) => {
 };
 
 const upload = multer({
-  storage: storage,
-  fileFilter: fileFilter,
+  storage,
+  fileFilter,
   limits: { fileSize: 5 * 1024 * 1024 } // 5MB limit
 });
 
