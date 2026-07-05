@@ -1,17 +1,19 @@
 // server/routes/ai.js
 import express from 'express';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GoogleGenAI } from '@google/genai';
 import { protect, isEmployer } from '../middleware/auth.js';
 
 const router = express.Router();
 
 // Initialize Gemini with proper error handling
-let genAI = null;
+let ai = null;
 let isGeminiAvailable = false;
+
+const GEMINI_MODEL = 'gemini-2.5-flash'; // swap to 'gemini-2.5-pro' for higher quality, more cost/latency
 
 try {
   const apiKey = process.env.GOOGLE_GEMINI_API_KEY;
-  
+
   if (!apiKey) {
     console.error('❌ GOOGLE_GEMINI_API_KEY not found in environment variables');
     console.error('Please add your API key to .env file');
@@ -19,13 +21,15 @@ try {
     console.error('❌ Invalid GOOGLE_GEMINI_API_KEY format');
     console.error('Please add a valid API key to .env file');
   } else {
-    genAI = new GoogleGenerativeAI(apiKey);
+    ai = new GoogleGenAI({ apiKey });
     isGeminiAvailable = true;
     console.log('✅ Google Gemini initialized successfully');
-    
+
     // Test the API key with a simple request
-    const testModel = genAI.getGenerativeModel({ model: "gemini-pro" });
-    testModel.generateContent("Test")
+    ai.models.generateContent({
+      model: GEMINI_MODEL,
+      contents: 'Test',
+    })
       .then(() => console.log('✅ Gemini API key verified successfully'))
       .catch((err) => {
         console.error('❌ Gemini API key verification failed:', err.message);
@@ -48,13 +52,13 @@ const checkGeminiAvailability = (req, res, next) => {
 
 router.post('/generate-job-description', protect, isEmployer, checkGeminiAvailability, async (req, res) => {
   try {
-    const { 
-      jobTitle, 
-      company, 
-      experienceLevel, 
-      jobType, 
+    const {
+      jobTitle,
+      company,
+      experienceLevel,
+      jobType,
       category,
-      location 
+      location
     } = req.body;
 
     // Validate required fields
@@ -63,17 +67,6 @@ router.post('/generate-job-description', protect, isEmployer, checkGeminiAvailab
         error: 'Missing required fields: jobTitle and company are required'
       });
     }
-
-    // Get Gemini model
-    const model = genAI.getGenerativeModel({ 
-      model: "gemini-pro",
-      generationConfig: {
-        temperature: 0.7,
-        topK: 1,
-        topP: 0.8,
-        maxOutputTokens: 2048,
-      },
-    });
 
     const prompt = `
 You are a professional HR and recruitment expert. Generate a comprehensive job description for the following position:
@@ -101,12 +94,21 @@ The output must be valid JSON only, no additional text.`;
     const timeoutId = setTimeout(() => controller.abort(), 30000);
 
     try {
-      const result = await model.generateContent(prompt);
+      const result = await ai.models.generateContent({
+        model: GEMINI_MODEL,
+        contents: prompt,
+        config: {
+          temperature: 0.7,
+          topK: 1,
+          topP: 0.8,
+          maxOutputTokens: 2048,
+        },
+      });
+
       clearTimeout(timeoutId);
-      
-      const response = await result.response;
-      const text = response.text();
-      
+
+      const text = result.text;
+
       // Parse JSON from response
       let suggestions;
       try {
@@ -127,7 +129,7 @@ The output must be valid JSON only, no additional text.`;
       suggestions = ensureFieldsExist(suggestions, { jobTitle, company, experienceLevel, category });
 
       res.json(suggestions);
-      
+
     } catch (error) {
       if (error.name === 'AbortError') {
         console.error('Request timeout');
@@ -135,7 +137,7 @@ The output must be valid JSON only, no additional text.`;
       }
       throw error;
     }
-    
+
   } catch (error) {
     console.error('Gemini API Error:', error);
     // Return fallback suggestions on error
@@ -152,13 +154,13 @@ function extractDataFromText(text) {
     responsibilities: [],
     skills: []
   };
-  
+
   const lines = text.split('\n');
   let currentSection = '';
-  
+
   for (const line of lines) {
     const cleanLine = line.trim();
-    
+
     if (cleanLine.toLowerCase().includes('description')) {
       currentSection = 'description';
       continue;
@@ -172,7 +174,7 @@ function extractDataFromText(text) {
       currentSection = 'skills';
       continue;
     }
-    
+
     if (cleanLine && currentSection) {
       if (currentSection === 'description') {
         extractedData.description += cleanLine + ' ';
@@ -184,14 +186,14 @@ function extractDataFromText(text) {
       }
     }
   }
-  
+
   return extractedData;
 }
 
 // Helper function to ensure all fields exist
 function ensureFieldsExist(suggestions, { jobTitle, company, experienceLevel, category }) {
   const result = { ...suggestions };
-  
+
   if (!result.description || result.description.trim().length < 50) {
     result.description = `We are looking for a talented ${jobTitle} to join our team at ${company}. This is an exciting opportunity for a ${experienceLevel || 'dynamic'} level professional to make a significant impact in the ${category || 'growing'} industry.
 
@@ -199,7 +201,7 @@ As a ${jobTitle}, you will be responsible for driving innovation and delivering 
 
 This is an exciting time to join ${company} as we continue to grow and expand our operations. You will have the opportunity to work with cutting-edge technologies and shape the future of our products and services.`;
   }
-  
+
   if (!result.requirements || result.requirements.length === 0) {
     result.requirements = [
       `Bachelor's degree in ${category || 'relevant'} field`,
@@ -211,7 +213,7 @@ This is an exciting time to join ${company} as we continue to grow and expand ou
       'Strong attention to detail'
     ];
   }
-  
+
   if (!result.responsibilities || result.responsibilities.length === 0) {
     result.responsibilities = [
       'Collaborate with cross-functional teams to deliver high-quality solutions',
@@ -223,7 +225,7 @@ This is an exciting time to join ${company} as we continue to grow and expand ou
       'Mentor junior team members'
     ];
   }
-  
+
   if (!result.skills || result.skills.length === 0) {
     result.skills = [
       'Problem-solving',
@@ -235,7 +237,7 @@ This is an exciting time to join ${company} as we continue to grow and expand ou
       'Leadership'
     ];
   }
-  
+
   return result;
 }
 
@@ -245,7 +247,7 @@ function getFallbackSuggestions({ jobTitle, company, experienceLevel, category }
   const companyName = company || 'our company';
   const level = experienceLevel || 'experienced';
   const cat = category || 'relevant';
-  
+
   return {
     description: `We are seeking a talented and motivated ${title} to join our dynamic team at ${companyName}. This role offers an excellent opportunity for professional growth and making a meaningful impact in the ${cat} industry.
 
