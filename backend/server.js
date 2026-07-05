@@ -13,22 +13,27 @@ import adminRoutes from "./src/routes/adminRoutes.js";
 import resumeRoutes from "./src/routes/resumeRoutes.js";
 import aiRoutes from "./src/routes/ai.js";
 
+// Load .env
 dotenv.config();
+
+// Debug (remove later)
+console.log("Mongo URI Loaded:", process.env.MONGODB_URI ? "YES ✅" : "NO ❌");
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
 
-// Connect Database
+// Connect MongoDB
 await connectDB();
 
-// =======================
+// =========================
 // Middleware
-// =======================
+// =========================
+
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "*",
+    origin: process.env.CLIENT_URL || "http://localhost:5173",
     credentials: true,
   })
 );
@@ -36,36 +41,37 @@ app.use(
 app.use(express.json({ limit: "20mb" }));
 app.use(express.urlencoded({ extended: true, limit: "20mb" }));
 
-// Static Files
+// Static Folder
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-// =======================
+// =========================
 // Root Route
-// =======================
+// =========================
+
 app.get("/", (req, res) => {
-  res.status(200).json({
+  res.json({
     success: true,
     message: "🚀 Job Board Backend API Running",
     version: "1.0.0",
-    environment: process.env.NODE_ENV || "development",
   });
 });
 
-// =======================
-// Health Check
-// =======================
+// =========================
+// Health Route
+// =========================
+
 app.get("/api/health", (req, res) => {
-  res.status(200).json({
+  res.json({
     success: true,
     status: "OK",
-    message: "Backend is healthy",
-    timestamp: new Date().toISOString(),
+    time: new Date(),
   });
 });
 
-// =======================
+// =========================
 // API Routes
-// =======================
+// =========================
+
 app.use("/api/auth", authRoutes);
 app.use("/api/jobs", jobRoutes);
 app.use("/api/applications", applicationRoutes);
@@ -73,19 +79,21 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/resume", resumeRoutes);
 app.use("/api/ai", aiRoutes);
 
-// =======================
-// 404 Handler
-// =======================
+// =========================
+// 404
+// =========================
+
 app.use((req, res) => {
   res.status(404).json({
     success: false,
-    message: `Route '${req.originalUrl}' not found`,
+    message: `Route ${req.originalUrl} not found`,
   });
 });
 
-// =======================
+// =========================
 // Error Handler
-// =======================
+// =========================
+
 app.use((err, req, res, next) => {
   console.error(err);
 
@@ -95,16 +103,16 @@ app.use((err, req, res, next) => {
   });
 });
 
-// =======================
-// Local Development Only
-// =======================
+// =========================
+// Local Server
+// =========================
+
 const PORT = process.env.PORT || 5000;
 
 if (!process.env.VERCEL) {
   app.listen(PORT, () => {
-    console.log(`🚀 Server running on http://localhost:${PORT}`);
+    console.log(`🚀 Server Running on http://localhost:${PORT}`);
   });
 }
 
-// Export for Vercel
 export default app;
