@@ -164,8 +164,8 @@ const Navbar = () => {
                   to={link.path}
                   className={`flex items-center px-4 py-2 rounded-lg transition-all duration-200 ${
                     isActiveRoute(link.path)
-                      ? 'bg-blue-50/80 text-blue-600 font-semibold'
-                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100/50'
+                      ? 'bg-blue-50/80 text-black font-semibold'
+                      : 'text-black hover:text-black hover:bg-gray-100/50'
                   }`}
                 >
                   {link.icon}
@@ -182,10 +182,10 @@ const Navbar = () => {
                     <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-400 to-blue-600 flex items-center justify-center text-white font-semibold text-sm">
                       {user?.name?.charAt(0).toUpperCase() || 'U'}
                     </div>
-                    <span className="text-gray-700 font-medium max-w-[100px] truncate">
+                    <span className="text-black font-medium max-w-[100px] truncate">
                       {user?.name}
                     </span>
-                    <FiChevronDown className={`text-gray-400 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
+                    <FiChevronDown className={`text-black transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
                   </button>
 
                   <AnimatePresence>
@@ -203,10 +203,10 @@ const Navbar = () => {
                               {user?.name?.charAt(0).toUpperCase() || 'U'}
                             </div>
                             <div className="flex-1 min-w-0">
-                              <p className="font-semibold text-gray-800 truncate">
+                              <p className="font-semibold text-black truncate">
                                 {user?.name}
                               </p>
-                              <p className="text-sm text-gray-500 truncate">
+                              <p className="text-sm text-black truncate">
                                 {user?.email}
                               </p>
                               {roleBadge && (
@@ -240,9 +240,9 @@ const Navbar = () => {
                             <Link
                               to={getDashboardLink()}
                               onClick={() => setIsDropdownOpen(false)}
-                              className="flex items-center px-4 py-2.5 text-gray-700 hover:bg-gray-100/50 transition-colors"
+                              className="flex items-center px-4 py-2.5 text-black hover:bg-gray-100/50 transition-colors"
                             >
-                              <span className="w-8 flex justify-center text-gray-400">
+                              <span className="w-8 flex justify-center text-black">
                                 {getDashboardIcon()}
                               </span>
                               <span>{getDashboardLabel()}</span>
@@ -255,9 +255,9 @@ const Navbar = () => {
                               <Link
                                 to="/employer/post-job"
                                 onClick={() => setIsDropdownOpen(false)}
-                                className="flex items-center px-4 py-2.5 text-gray-700 hover:bg-gray-100/50 transition-colors"
+                                className="flex items-center px-4 py-2.5 text-black hover:bg-gray-100/50 transition-colors"
                               >
-                                <span className="w-8 flex justify-center text-gray-400">
+                                <span className="w-8 flex justify-center text-black">
                                   <FiPlusCircle />
                                 </span>
                                 <span>Post a Job</span>
@@ -265,9 +265,9 @@ const Navbar = () => {
                               <Link
                                 to="/employer/my-jobs"
                                 onClick={() => setIsDropdownOpen(false)}
-                                className="flex items-center px-4 py-2.5 text-gray-700 hover:bg-gray-100/50 transition-colors"
+                                className="flex items-center px-4 py-2.5 text-black hover:bg-gray-100/50 transition-colors"
                               >
-                                <span className="w-8 flex justify-center text-gray-400">
+                                <span className="w-8 flex justify-center text-black">
                                   <FiList />
                                 </span>
                                 <span>My Jobs</span>
@@ -280,9 +280,9 @@ const Navbar = () => {
                               <Link
                                 to="/candidate/applications"
                                 onClick={() => setIsDropdownOpen(false)}
-                                className="flex items-center px-4 py-2.5 text-gray-700 hover:bg-gray-100/50 transition-colors"
+                                className="flex items-center px-4 py-2.5 text-black hover:bg-gray-100/50 transition-colors"
                               >
-                                <span className="w-8 flex justify-center text-gray-400">
+                                <span className="w-8 flex justify-center text-black">
                                   <FiList />
                                 </span>
                                 <span>My Applications</span>
@@ -290,9 +290,9 @@ const Navbar = () => {
                               <Link
                                 to="/candidate/matched-jobs"
                                 onClick={() => setIsDropdownOpen(false)}
-                                className="flex items-center px-4 py-2.5 text-gray-700 hover:bg-gray-100/50 transition-colors"
+                                className="flex items-center px-4 py-2.5 text-black hover:bg-gray-100/50 transition-colors"
                               >
-                                <span className="w-8 flex justify-center text-gray-400">
+                                <span className="w-8 flex justify-center text-black">
                                   <FiTrendingUp />
                                 </span>
                                 <span>Matched Jobs</span>
@@ -300,9 +300,9 @@ const Navbar = () => {
                               <Link
                                 to="/candidate/ats-check"
                                 onClick={() => setIsDropdownOpen(false)}
-                                className="flex items-center px-4 py-2.5 text-gray-700 hover:bg-gray-100/50 transition-colors"
+                                className="flex items-center px-4 py-2.5 text-black hover:bg-gray-100/50 transition-colors"
                               >
-                                <span className="w-8 flex justify-center text-gray-400">
+                                <span className="w-8 flex justify-center text-black">
                                   <FiBarChart2 />
                                 </span>
                                 <span>ATS Check</span>
@@ -310,9 +310,9 @@ const Navbar = () => {
                               <Link
                                 to="/candidate/resume"
                                 onClick={() => setIsDropdownOpen(false)}
-                                className="flex items-center px-4 py-2.5 text-gray-700 hover:bg-gray-100/50 transition-colors"
+                                className="flex items-center px-4 py-2.5 text-black hover:bg-gray-100/50 transition-colors"
                               >
-                                <span className="w-8 flex justify-center text-gray-400">
+                                <span className="w-8 flex justify-center text-black">
                                   <FiUpload />
                                 </span>
                                 <span>My Resume</span>
@@ -328,9 +328,9 @@ const Navbar = () => {
                           <Link
                             to="/profile"
                             onClick={() => setIsDropdownOpen(false)}
-                            className="flex items-center px-4 py-2.5 text-gray-700 hover:bg-gray-100/50 transition-colors"
+                            className="flex items-center px-4 py-2.5 text-black hover:bg-gray-100/50 transition-colors"
                           >
-                            <span className="w-8 flex justify-center text-gray-400">
+                            <span className="w-8 flex justify-center text-black">
                               <FiSettings />
                             </span>
                             <span>Profile Settings</span>
@@ -342,7 +342,7 @@ const Navbar = () => {
                             onClick={handleLogout}
                             className="w-full flex items-center px-4 py-2.5 text-red-600 hover:bg-red-50 transition-colors"
                           >
-                            <span className="w-8 flex justify-center">
+                            <span className="w-8 flex justify-center text-red-600">
                               <FiLogOut />
                             </span>
                             <span>Logout</span>
@@ -356,7 +356,7 @@ const Navbar = () => {
                 <div className="flex items-center space-x-2 ml-2">
                   <Link
                     to="/login"
-                    className="flex items-center px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100/50 rounded-lg transition-colors"
+                    className="flex items-center px-4 py-2 text-black hover:text-black hover:bg-gray-100/50 rounded-lg transition-colors"
                   >
                     <FiLogIn className="mr-1" />
                     Login
@@ -377,7 +377,7 @@ const Navbar = () => {
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="md:hidden p-2 rounded-lg hover:bg-gray-100/50 transition-colors"
             >
-              {isMenuOpen ? <FiX size={24} /> : <FiMenu size={24} />}
+              {isMenuOpen ? <FiX size={24} className="text-black" /> : <FiMenu size={24} className="text-black" />}
             </button>
           </div>
         </div>
@@ -401,11 +401,11 @@ const Navbar = () => {
                       onClick={() => setIsMenuOpen(false)}
                       className={`flex items-center px-4 py-3 rounded-lg transition-colors ${
                         isActiveRoute(link.path)
-                          ? 'bg-blue-50/80 text-blue-600 font-semibold'
-                          : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100/50'
+                          ? 'bg-blue-50/80 text-black font-semibold'
+                          : 'text-black hover:text-black hover:bg-gray-100/50'
                       }`}
                     >
-                      <span className="w-6 flex justify-center">{link.icon}</span>
+                      <span className="w-6 flex justify-center text-black">{link.icon}</span>
                       <span className="ml-3">{link.label}</span>
                     </Link>
                   ))}
@@ -419,10 +419,10 @@ const Navbar = () => {
                             {user?.name?.charAt(0).toUpperCase() || 'U'}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="font-semibold text-gray-800 truncate">
+                            <p className="font-semibold text-black truncate">
                               {user?.name}
                             </p>
-                            <p className="text-sm text-gray-500 truncate">
+                            <p className="text-sm text-black truncate">
                               {user?.email}
                             </p>
                             {roleBadge && (
@@ -454,17 +454,17 @@ const Navbar = () => {
                           <Link
                             to="/candidate/ats-check"
                             onClick={() => setIsMenuOpen(false)}
-                            className="flex items-center px-4 py-3 text-gray-600 hover:text-gray-900 hover:bg-gray-100/50 rounded-lg transition-colors"
+                            className="flex items-center px-4 py-3 text-black hover:text-black hover:bg-gray-100/50 rounded-lg transition-colors"
                           >
-                            <span className="w-6 flex justify-center"><FiBarChart2 /></span>
+                            <span className="w-6 flex justify-center text-black"><FiBarChart2 /></span>
                             <span className="ml-3">ATS Check</span>
                           </Link>
                           <Link
                             to="/candidate/resume"
                             onClick={() => setIsMenuOpen(false)}
-                            className="flex items-center px-4 py-3 text-gray-600 hover:text-gray-900 hover:bg-gray-100/50 rounded-lg transition-colors"
+                            className="flex items-center px-4 py-3 text-black hover:text-black hover:bg-gray-100/50 rounded-lg transition-colors"
                           >
-                            <span className="w-6 flex justify-center"><FiUpload /></span>
+                            <span className="w-6 flex justify-center text-black"><FiUpload /></span>
                             <span className="ml-3">My Resume</span>
                             {!hasResume && (
                               <span className="ml-auto text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full">
@@ -478,9 +478,9 @@ const Navbar = () => {
                       <Link
                         to="/profile"
                         onClick={() => setIsMenuOpen(false)}
-                        className="flex items-center px-4 py-3 text-gray-600 hover:text-gray-900 hover:bg-gray-100/50 rounded-lg transition-colors"
+                        className="flex items-center px-4 py-3 text-black hover:text-black hover:bg-gray-100/50 rounded-lg transition-colors"
                       >
-                        <span className="w-6 flex justify-center"><FiSettings /></span>
+                        <span className="w-6 flex justify-center text-black"><FiSettings /></span>
                         <span className="ml-3">Profile Settings</span>
                       </Link>
                       
@@ -488,7 +488,7 @@ const Navbar = () => {
                         onClick={handleLogout}
                         className="w-full flex items-center px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                       >
-                        <span className="w-6 flex justify-center"><FiLogOut /></span>
+                        <span className="w-6 flex justify-center text-red-600"><FiLogOut /></span>
                         <span className="ml-3">Logout</span>
                       </button>
                     </>
@@ -497,9 +497,9 @@ const Navbar = () => {
                       <Link
                         to="/login"
                         onClick={() => setIsMenuOpen(false)}
-                        className="flex items-center justify-center px-4 py-3 border-2 border-gray-200 text-gray-600 rounded-lg hover:bg-gray-100/50 transition-colors"
+                        className="flex items-center justify-center px-4 py-3 border-2 border-gray-200 text-black rounded-lg hover:bg-gray-100/50 transition-colors"
                       >
-                        <FiLogIn className="mr-2" />
+                        <FiLogIn className="mr-2 text-black" />
                         Login
                       </Link>
                       <Link
